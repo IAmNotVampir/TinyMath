@@ -22,7 +22,7 @@ public class LexicalTokinizerTest {
 
 	@Test
 	public void test() throws ParserException {
-		LexicalTokenizer tok = new LexicalTokenizer("cos(33.33)+mod(-5)"); 
+		LexicalTokenizer tok = new LexicalTokenizer("cos(33.33)+mod(-5)*sadkgl+8"); 
 		Token t = tok.getNextToken();
 		while(t.getTokenType()!=LexicalTokenizer.EOL){
 			System.out.println(t.getsValue());

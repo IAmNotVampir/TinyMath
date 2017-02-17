@@ -12,6 +12,7 @@ public class LexicalTokenizer {
 	public final static int OPERATOR = 2;
 	public final static int FUNCTION = 3;
 	public final static int BRACKETS = 4;
+	public final static int UNKNOW = 5;
 	
 	protected char buffer[];
 	protected int currentPosition=0;
@@ -31,23 +32,21 @@ public class LexicalTokenizer {
 		previousPosition=currentPosition;
 
 		//пропускаем пробелы
-		while ((buffer[currentPosition]==' ') || (buffer[currentPosition]=='\t'))
+		do
 		{
 			//если достигнут конец выражения
 			if (currentPosition>=buffer.length) {
 				return EOLToken;
 			};
-			currentPosition++;
-		}
+		}while ((buffer[currentPosition]==' ') || (buffer[currentPosition++]=='\t'));
 		
 		//на входе получено число
 		if ((Character.isDigit(buffer[currentPosition]))||(buffer[currentPosition]=='.')){
 			str = new StringBuffer();
-			while((Character.isDigit(buffer[currentPosition]))||(buffer[currentPosition]=='.')
-					&&(currentPosition<buffer.length))
+			while((Character.isDigit(buffer[currentPosition]))||(buffer[currentPosition]=='.'))
 				{
-				str.append(buffer[currentPosition]);
-				currentPosition++;
+				str.append(buffer[currentPosition++]);
+				if (currentPosition>=buffer.length) break;
 				}
 			return new Token(NUMBER,0,str.toString());
 		}
@@ -55,47 +54,30 @@ public class LexicalTokenizer {
 		// на входе получен оператор
 		for (int i =0; i < ExpressionNode.operators.length;i++){
 			if (buffer[currentPosition]==ExpressionNode.operators[i]){
-				Token t = new Token(OPERATOR,i,String.valueOf(buffer[currentPosition])); 
-				currentPosition++;
-				return t ;
+				return new Token(OPERATOR,i,String.valueOf(buffer[currentPosition++])) ;
 			}
 		}
 		
 		//на входе получена функция
-		boolean compare;
-		int prFunID = 0;
-		String prStr = new String();
-		String curStr = new String();
-		for (int i=0;i<FunctionExpressionNode.functions.length;i++){
-			compare=true;
-			curStr=FunctionExpressionNode.functions[i];
-			for (int k =0 ; k<curStr.length();k++){
-				if ((buffer[currentPosition+k]!=curStr.charAt(k))||
-						((currentPosition+k)>=buffer.length)){
-					compare=false;
-					break;
-				}
-			}		
-			/*
-			одна функция может включать в себя наименование другой,
-			тогда выбирается функция с более длинным именем.
-			 */
-			if (compare&&((prStr.isEmpty())||(prStr.length()<curStr.length()))){
-				prStr=curStr;
-				prFunID=i;
+		if (Character.isLetter(buffer[currentPosition])){
+			str = new StringBuffer();
+			while (Character.isLetter(buffer[currentPosition])){
+				str.append(buffer[currentPosition++]);
+				if (currentPosition>=buffer.length) break;
 			}
-		}
-		
-		if (!prStr.isEmpty()){
-			currentPosition=currentPosition+prStr.length();
-			return new Token(FUNCTION,prFunID,prStr);
+			String fun = str.toString();
+			for(int i=0; i<FunctionExpressionNode.functions.length; i++){
+				if (FunctionExpressionNode.functions[i].equals(fun)) {
+					return new Token(FUNCTION,i,fun);
+				}
+				return new Token(UNKNOW,0,fun);
+			}
 		}
 		
 		//на вход получены '(' ')'
 		if ((buffer[currentPosition]==')')||(buffer[currentPosition]=='('))
 		{
-			Token t = new Token(BRACKETS,0,String.valueOf(buffer[currentPosition]));
-			currentPosition++;
+			Token t = new Token(BRACKETS,0,String.valueOf(buffer[currentPosition++]));
 			return t;
 		}
 		
