@@ -8,13 +8,13 @@ import com.rok.tinyMath.Exceptions.ParserException;
 
 public class ExpressionNode {
 	
-	
-		final static int  OP_ADD = 0;   // Addition '+'
-		final static int  OP_SUB = 1;   // Subtraction '-'
-		final static int  OP_MUL = 2;   // Multiplication '*'
-		final static int  OP_DIV = 3;   // Division '/'
-	
-    
+
+	public final static int  OP_ADD = 0;   // Addition '+'
+	public final static int  OP_SUB = 1;   // Subtraction '-'
+	public final static int  OP_MUL = 2;   // Multiplication '*'
+	public final static int  OP_DIV = 3;   // Division '/'
+
+
 	protected ExpressionNode arg1,arg2;
 	protected int oper;
 	public static char[] operators = {

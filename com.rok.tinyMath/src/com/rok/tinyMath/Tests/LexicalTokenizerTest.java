@@ -7,10 +7,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.rok.tinyMath.Exceptions.ParserException;
-import com.rok.tinyMath.core.LexicalTokenizer;
-import com.rok.tinyMath.core.Token;
+import com.rok.tinyMath.Parser.LexicalTokenizer;
+import com.rok.tinyMath.Parser.Token;
+import com.rok.tinyMath.Parser.Token.TType;
 
-public class LexicalTokinizerTest {
+public class LexicalTokenizerTest {
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -22,12 +23,13 @@ public class LexicalTokinizerTest {
 
 	@Test
 	public void test() throws ParserException {
-		LexicalTokenizer tok = new LexicalTokenizer("cos(33.33)+mod(-5)*sadkgl+8"); 
-		Token t = tok.getNextToken();
-		while(t.getTokenType()!=LexicalTokenizer.EOL){
-			System.out.println(t.getsValue());
-			t = tok.getNextToken();
-		}
+		LexicalTokenizer tok = new LexicalTokenizer("cos(33.33)+mod(-5)*sadkgl+8+mod(xy,y,zjk)-asdlfh"); 
+		Token t;
+		do
+		{
+			t = tok.next();
+			System.out.println(t);
+		}while(t.getTokenType()!=TType.EOL);
 		
 	}
 

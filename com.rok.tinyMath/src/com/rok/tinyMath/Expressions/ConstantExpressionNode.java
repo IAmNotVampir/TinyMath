@@ -1,10 +1,10 @@
 package com.rok.tinyMath.Expressions;
 
-public class ConstantExcpressionNode extends ExpressionNode {
+public class ConstantExpressionNode extends ExpressionNode {
 	
 	double v;
 	
-	public ConstantExcpressionNode(double a){
+	public ConstantExpressionNode(double a){
 		v=a;
 	}
 	
