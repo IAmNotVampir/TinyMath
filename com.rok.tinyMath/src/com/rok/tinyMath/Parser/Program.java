@@ -121,14 +121,13 @@ public class Program {
 		}
 		
 		if (lt.match(TType.OPEN_BRACKET)){
-			
-			List<Token> tokenList = parseBRACKETS(lt);	
-			LexicalTokenizer lt1 = new LexicalTokenizer(tokenList); 
-			return startParse(lt);
+			 
+			return parseBRACKETS(lt);
 			
 		}
 		
-		throw new RuntimeException("Unknow Expression"+t);
+		throw new SyntaxException();
+
 		
 	}
 
@@ -148,67 +147,38 @@ public class Program {
 		case FunctionExpressionNode.ABS:
 		case FunctionExpressionNode.CEIL:
 
-			t=lt.next();
-			if (t.getTokenType()!=TType.OPEN_BRACKET){
+			if (!lt.match(TType.OPEN_BRACKET)){
 				throw new SyntaxException();	
 			}
 
-			ExpressionNode e;
-			t=lt.next();
-			if(t.getTokenType()==TType.NUMBER){
-				e=parseNUMBER(t);
-			}else if (t.getTokenType()==TType.UNKNOW){
-				e=parseUNKNOW(t);
-			}else{
-				throw new SyntaxException();
-			}
+			ExpressionNode e = parseAddSub(lt);
 
-			t=lt.next();
-			if(t.getTokenType()==TType.CLOSE_BRACKET){
-				return new FunctionExpressionNode(prToken.getTokenID(),e);
-			}else{
+			if(!lt.match(TType.CLOSE_BRACKET)){
 				throw new SyntaxException();
 			}
+			
+			return new FunctionExpressionNode(prToken.getTokenID(),e);
 
 		case FunctionExpressionNode.POW:
 		case FunctionExpressionNode.MOD:
 
-			t=lt.next();
-			if (t.getTokenType()!=TType.OPEN_BRACKET){
-				throw new SyntaxException();
+			if (!lt.match(TType.OPEN_BRACKET)){
+				throw new SyntaxException();	
 			}
 
-			ExpressionNode e1;
-			t=lt.next();
-			if(t.getTokenType()==TType.NUMBER){
-				e1=parseNUMBER(t);
-			}else if (t.getTokenType()==TType.UNKNOW){
-				e1=parseUNKNOW(t);
-			}else{
-				throw new SyntaxException();
+			ExpressionNode e1 = parseAddSub(lt);
+
+			if (!lt.match(TType.DELIMETER)){
+				throw new SyntaxException();	
 			}
 
-			t=lt.next();
-			if (t.getTokenType()!=TType.DELIMETER){
-				throw new SyntaxException();
-			}
+			ExpressionNode e2 = parseAddSub(lt);
 
-			ExpressionNode e2;
-			t=lt.next();
-			if(t.getTokenType()==TType.NUMBER){
-				e2=parseNUMBER(t);
-			}else if (t.getTokenType()==TType.UNKNOW){
-				e2=parseUNKNOW(t);
-			}else{
+			if(!lt.match(TType.CLOSE_BRACKET)){
 				throw new SyntaxException();
 			}
-
-			t=lt.next();
-			if(t.getTokenType()==TType.CLOSE_BRACKET){
-				return new FunctionExpressionNode(prToken.getTokenID(),e1,e2);
-			}else{
-				throw new SyntaxException();
-			}
+			
+			return new FunctionExpressionNode(prToken.getTokenID(),e1,e2);
 
 		default:
 			throw new RuntimeException("Unknow function");
@@ -225,6 +195,7 @@ public class Program {
 		}else{
 			throw new ParserException("Unknow Constant");
 		}
+		
 	}
 
 	private ExpressionNode parseNUMBER(Token t) throws ParserException{
@@ -235,27 +206,13 @@ public class Program {
 		}
 	}
 
-	private List<Token> parseBRACKETS(LexicalTokenizer lt) throws ParserException{
+	private ExpressionNode parseBRACKETS(LexicalTokenizer lt) throws ParserException{
 
-		List<Token> tokenList = new LinkedList<Token>();
-		int openBrCount = 1;
-		Token t;
-		do{
-			t=lt.next();
-			if (t.getTokenType()==TType.OPEN_BRACKET){
-				openBrCount++;
-			}else if(t.getTokenType()==TType.CLOSE_BRACKET){
-				openBrCount--;
-			}
-			if (openBrCount>0) tokenList.add(t);		
-		}while((t.getTokenType()!=TType.EOL)&&(openBrCount>0));
-		
-		tokenList.add(new Token(TType.EOL,0,new String()));
-
-		if (openBrCount>0){
-			throw new ParserException("Unclosed Bracket");
+		ExpressionNode result = parseAddSub(lt);
+		if (lt.match(TType.CLOSE_BRACKET)){
+			return result;
 		}else{
-			return tokenList;
+			throw new ParserException("Unclosed Bracket");
 		}
 
 	}
