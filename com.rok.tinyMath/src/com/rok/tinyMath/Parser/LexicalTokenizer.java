@@ -69,6 +69,15 @@ public class LexicalTokenizer {
 				{
 				strbuff.append(buffer[currentPosition++]);
 				if (currentPosition>=buffer.length) break;
+				//для поддержки научной записи числа
+				if (buffer[currentPosition]=='E'){
+					strbuff.append(buffer[currentPosition++]);
+					if (currentPosition>=buffer.length) break;
+					if ((buffer[currentPosition]=='+')||(buffer[currentPosition]=='-')){
+						strbuff.append(buffer[currentPosition++]);
+						if (currentPosition>=buffer.length) break;
+					}
+				}
 				}
 			return new Token(TType.NUMBER,0,strbuff.toString());
 		}

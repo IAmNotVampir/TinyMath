@@ -31,6 +31,6 @@ public class ParserTest {
 				+ "*(pow(5,50)+ceil(5)+mod(5,5))");
 		assertTrue(answer1==answer2);
 		
-		p.Execute("1E2.1+1.00E+2");
+		p.Execute("1.25E+2+1,00E+2");
 	}
 }
