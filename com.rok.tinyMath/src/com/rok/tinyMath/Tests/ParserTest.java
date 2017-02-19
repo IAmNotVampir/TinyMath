@@ -30,6 +30,7 @@ public class ParserTest {
 		double answer2 = p.Execute("sin(5)+cos(5+5)+sqrt(5)+abs(-5)+log(5)*floor(5)"
 				+ "*(pow(5,50)+ceil(5)+mod(5,5))");
 		assertTrue(answer1==answer2);
+		
+		p.Execute("1E2.1+1.00E+2");
 	}
-
 }
