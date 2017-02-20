@@ -1,24 +1,25 @@
 package com.rok.tinyMath.Expressions;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.rok.tinyMath.Exceptions.ParserException;
 
-public class FunctionExpressionNode extends ExpressionNode {
-		
-		public final static int COS = 0;
-		public final static int SIN = 1;
-		public final static int POW = 2;
-		public final static int LOG = 3;
-		public final static int ABS = 4;
-		public final static int MOD = 5;
-		public final static int SQRT= 6;
-		public final static int CEIL= 7;
-		public final static int FLOOR = 8;	
-		
-	
+public class FunctionExpressionNode extends ExpressionNode{
+
+	public final static int COS = 0;
+	public final static int SIN = 1;
+	public final static int POW = 2;
+	public final static int LOG = 3;
+	public final static int ABS = 4;
+	public final static int MOD = 5;
+	public final static int SQRT= 6;
+	public final static int CEIL= 7;
+	public final static int FLOOR = 8;	
+
 	protected int fun;
+	
 	public static final String[] functions = {
 			"cos",
 			"sin",

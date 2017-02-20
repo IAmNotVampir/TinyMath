@@ -97,6 +97,10 @@ public class LexicalTokenizer {
 				if (currentPosition>=buffer.length) break;
 			}
 			String fun = strbuff.toString().intern();
+			//объевление новой функции
+			if(fun=="func".intern()){
+				return new Token(TType.FUNCTION_DEC,0,fun);
+			}
 			for(int i=0; i<FunctionExpressionNode.functions.length; i++){
 				if (FunctionExpressionNode.functions[i]==fun) {
 					return new Token(TType.FUNCTION,i,fun);
@@ -121,6 +125,12 @@ public class LexicalTokenizer {
 		if (buffer[currentPosition]==',')
 		{
 			Token t = new Token(TType.DELIMETER,0,String.valueOf(buffer[currentPosition++]));
+			return t;
+		}
+		
+		if (buffer[currentPosition]=='=')
+		{
+			Token t = new Token(TType.EQUAL,0,String.valueOf(buffer[currentPosition++]));
 			return t;
 		}
 		

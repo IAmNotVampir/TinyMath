@@ -23,7 +23,7 @@ public class LexicalTokenizerTest {
 
 	@Test
 	public void test() throws ParserException {
-		LexicalTokenizer tok = new LexicalTokenizer("cos(33.33)+mod(-5)*sadkgl+8+mod(xy,y,zjk)-asdlfh"); 
+		LexicalTokenizer tok = new LexicalTokenizer("func jk(a,b)=a+1"); 
 		Token t;
 		do
 		{

@@ -1,5 +1,7 @@
 package com.rok.tinyMath.Expressions;
 
+import java.io.Serializable;
+
 public class ConstantExpressionNode extends ExpressionNode {
 	
 	double v;

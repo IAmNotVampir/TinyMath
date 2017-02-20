@@ -4,6 +4,8 @@ public class Token {
 	
 	public enum TType {
 	EOL,
+	FUNCTION_DEC,
+	EQUAL,
 	NUMBER,
     OPERATOR,
 	FUNCTION,

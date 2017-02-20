@@ -1,5 +1,10 @@
 package com.rok.tinyMath.Parser;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -16,11 +21,20 @@ import com.rok.tinyMath.Expressions.*;
 
 public class Program {
 	
-	protected Map<String,Double> constants = new HashMap<>();	
+	protected Map<String,ExpressionNode> constants = new HashMap<>();
+	protected Map<String,UserFunction> functions = new HashMap<>();
 
 	public double Execute(String str){
 
 		try {
+			//проверка на объявление новой функции
+			SubProgram sb = new SubProgram(this,str);
+			UserFunction fun = sb.parseSubProgram();
+			if (fun!=null){
+				functions.put(fun.getName(), fun);
+				return 0;
+			}
+			
 			LexicalTokenizer lt = new LexicalTokenizer(str);
 			ExpressionNode exp = startParse(lt);
 			Double answer = exp.getValue();
@@ -32,7 +46,7 @@ public class Program {
 		}
 	}
 
-	private ExpressionNode startParse(LexicalTokenizer lt) throws ParserException{
+	protected ExpressionNode startParse(LexicalTokenizer lt) throws ParserException{
 		
 		ExpressionNode result = parseAddSub(lt);
 		if (lt.match(TType.EOL)){
@@ -42,7 +56,7 @@ public class Program {
 		}
 	}
 
-	private ExpressionNode parseAddSub(LexicalTokenizer lt) throws ParserException{
+	protected ExpressionNode parseAddSub(LexicalTokenizer lt) throws ParserException{
 		
 		ExpressionNode result = parseMulDiv(lt);
 		
@@ -65,7 +79,7 @@ public class Program {
 		
 	}
 	
-	private ExpressionNode parseMulDiv(LexicalTokenizer lt) throws ParserException{
+	protected ExpressionNode parseMulDiv(LexicalTokenizer lt) throws ParserException{
 		
 		ExpressionNode result = parseUnary(lt);
 		
@@ -88,7 +102,7 @@ public class Program {
 		
 	}
 	
-	private ExpressionNode parseUnary(LexicalTokenizer lt) throws ParserException{
+	protected ExpressionNode parseUnary(LexicalTokenizer lt) throws ParserException{
 		
 		if (lt.match(TType.OPERATOR, ExpressionNode.OP_ADD)){			
 			return parsePrimary(lt);
@@ -104,7 +118,7 @@ public class Program {
 		
 	}
 	
-	private ExpressionNode parsePrimary(LexicalTokenizer lt) throws ParserException{
+	protected ExpressionNode parsePrimary(LexicalTokenizer lt) throws ParserException{
 		
 		Token t = lt.getCurToken();
 		
@@ -117,7 +131,7 @@ public class Program {
 		}
 		
 		if (lt.match(TType.UNKNOW)){
-			return parseUNKNOW(t);
+			return parseUNKNOW(t,lt);
 		}
 		
 		if (lt.match(TType.OPEN_BRACKET)){
@@ -133,7 +147,7 @@ public class Program {
 
 
 
-	private ExpressionNode parseFUNCTION(Token prToken, LexicalTokenizer lt) throws ParserException{
+	protected ExpressionNode parseFUNCTION(Token prToken, LexicalTokenizer lt) throws ParserException{
 
 		Token t;
 
@@ -187,18 +201,48 @@ public class Program {
 
 	}
 
-	private ExpressionNode parseUNKNOW(Token t) throws ParserException{
+	protected ExpressionNode parseUNKNOW(Token t, LexicalTokenizer lt) throws ParserException{
 
-		Double val = constants.get(t.sValue);
+		ExpressionNode val = getConstant(t);
 		if (val != null) {
-			return new ConstantExpressionNode(val);
-		}else{
-			throw new ParserException("Unknow Constant");
+			return val;
 		}
+
+		UserFunction ufun = getFunction(t.sValue);
+
+		if (ufun==null) {
+			if(!lt.match(TType.OPEN_BRACKET)){
+				throw new ParserException("Unknow Function");	
+			}else{
+				throw new ParserException("Unknow Constant");
+			}
+		}
+		
+		if(!lt.match(TType.OPEN_BRACKET)){
+			throw new SyntaxException();
+		}
+		
+		//перебираем аргументы функции
+		ExpressionNode e;
+		List<ExpressionNode> input= new LinkedList<>();	
+		e = parseAddSub(lt);
+		input.add(e);
+		while(lt.match(TType.DELIMETER))
+		{
+			e = parseAddSub(lt);
+			input.add(e);
+		}
+		if(!lt.match(TType.CLOSE_BRACKET)){
+			throw new SyntaxException();
+		}
+		
+		UserFunctionExpressionNode ufexp = new UserFunctionExpressionNode(ufun,input);
+		
+		return ufexp;
 		
 	}
 
-	private ExpressionNode parseNUMBER(Token t) throws ParserException{
+	protected ExpressionNode parseNUMBER(Token t) throws ParserException{
 		try {
 			return new ConstantExpressionNode(Double.valueOf(t.getsValue()));
 		}catch(NumberFormatException e){
@@ -206,7 +250,7 @@ public class Program {
 		}
 	}
 
-	private ExpressionNode parseBRACKETS(LexicalTokenizer lt) throws ParserException{
+	protected ExpressionNode parseBRACKETS(LexicalTokenizer lt) throws ParserException{
 
 		ExpressionNode result = parseAddSub(lt);
 		if (lt.match(TType.CLOSE_BRACKET)){
@@ -216,7 +260,42 @@ public class Program {
 		}
 
 	}
+	
+	protected ExpressionNode getConstant(Token t){
+		return constants.get(t.sValue);
+	}
+	
+	public ExpressionNode getUserFun(Token t){
+		return null;
+	}
 
+	public UserFunction getFunction(String str) {
+		
+		UserFunction exp = functions.get(str);
+		
+		if (exp==null) {
+			return null;
+		}
+		
+		//клонирование через сериализацию
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ObjectOutputStream oos;
+		try {
+			
+			oos = new ObjectOutputStream( baos );
+			oos.writeObject(exp);
+			oos.close();
+			
+			ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+			ObjectInputStream ois = new ObjectInputStream(bais);
+			
+			return (UserFunction)ois.readObject();
+			
+		} catch (Exception e) {
+			
+			throw new RuntimeException(e);
+		}			
+	}
 }
 
 

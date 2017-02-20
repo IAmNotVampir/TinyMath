@@ -1,12 +1,13 @@
 package com.rok.tinyMath.Expressions;
 
+import java.io.Serializable;
 import java.security.cert.Extension;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.rok.tinyMath.Exceptions.ParserException;
 
-public class ExpressionNode {
+public class ExpressionNode implements Serializable{
 	
 
 	public final static int  OP_ADD = 0;   // Addition '+'
