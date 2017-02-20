@@ -22,10 +22,8 @@ public class ParserTest {
 	public void test() {
 		
 		Program p = new Program();
-		p.Execute("func jk(a,b)=a*b+1");
-		p.Execute("jk(3,jk(3,2))");
 		
-		/*p.Execute("(1+1)*(1+1)*(1+1+abs(-5))");
+		p.Execute("(1+1)*(1+1)*(1+1+abs(-5))");
 		
 		double answer1 = Math.sin(5)+Math.cos(5+5)+Math.sqrt(5)+Math.abs(-5)+
 				Math.log(5)*Math.floor(5)*(Math.pow(5,50)+Math.ceil(
@@ -35,9 +33,12 @@ public class ParserTest {
 				+ "*(pow(5,50)+ceil(5)+mod(5,5))");
 		assertTrue(answer1==answer2);
 		
-		p.Execute("1.25E+2+1,00E+2");
+		p.Execute("1.25E+2");
 		
-		p.Execute("func jk(a)=a+1");
-		p.Execute("jk(1)");*/
+		
+		p.Execute("func jk(a,b)=a*2+sqrt(b)");
+		p.Execute("func op(g)=jk(g,4)+1");
+		p.Execute("op(op(2))");
+		
 	}
 }
