@@ -10,6 +10,12 @@ import com.rok.tinyMath.Expressions.ExpressionNode;
 import com.rok.tinyMath.Expressions.FunctionExpressionNode;
 import com.rok.tinyMath.Parser.Token.TType;;
 
+
+/**
+ * 
+ * Лексический анализатор
+ *
+ */
 public class LexicalTokenizer {
 	
 	protected char buffer[];
@@ -153,7 +159,10 @@ public class LexicalTokenizer {
 		}
 		
 	}
-	
+	/**
+	 * Сравниваем текущий токен, возвращаем true в случаи совпадения
+	 * и инкриментим указатель на текущий токен
+	 */
 	public boolean match(TType type) throws ParserException{
 		
 		if (currentToken.getTokenType()==type){

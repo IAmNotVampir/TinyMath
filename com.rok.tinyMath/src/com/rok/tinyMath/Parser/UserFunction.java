@@ -8,7 +8,9 @@ import com.rok.tinyMath.Expressions.UserExpressionNode;
 
 public class UserFunction implements Serializable{
 	
+	//выражение содержащее тело функции
 	public ExpressionNode body;
+	//
 	public List<UserExpressionNode> arg;
 	private String name;
 	

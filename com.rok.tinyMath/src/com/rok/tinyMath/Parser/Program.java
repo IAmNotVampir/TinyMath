@@ -21,20 +21,29 @@ import com.rok.tinyMath.Expressions.*;
 
 public class Program {
 	
+	//список глобальных переменных
 	protected Map<String,ExpressionNode> constants = new HashMap<>();
+	//список функций, созданных пользователем
 	protected Map<String,UserFunction> functions = new HashMap<>();
 
+/**
+ *  ѕарсинг данных из комендной строки, выполнение инструкций
+ * @param str содержимое командной строки
+ */
 	public double Execute(String str){
 
 		try {
+			
 			//проверка на объ€вление новой функции
 			SubProgram sb = new SubProgram(this,str);
 			UserFunction fun = sb.parseSubProgram();
 			if (fun!=null){
+				//объ€влена нова€ функци€, добавл€ем еЄ в список
 				functions.put(fun.getName(), fun);
 				return 0;
 			}
 			
+			//парсиг арифмитического выражени€
 			LexicalTokenizer lt = new LexicalTokenizer(str);
 			ExpressionNode exp = startParse(lt);
 			Double answer = exp.getValue();
@@ -201,6 +210,9 @@ public class Program {
 
 	}
 
+	/** 
+	 * ѕарсинг колнстант и функций, определенных пользователем
+	 */
 	protected ExpressionNode parseUNKNOW(Token t, LexicalTokenizer lt) throws ParserException{
 
 		ExpressionNode val = getConstant(t);
@@ -211,7 +223,7 @@ public class Program {
 		UserFunction ufun = getFunction(t.sValue);
 
 		if (ufun==null) {
-			if(!lt.match(TType.OPEN_BRACKET)){
+			if(lt.match(TType.OPEN_BRACKET)){
 				throw new ParserException("Unknow Function");	
 			}else{
 				throw new ParserException("Unknow Constant");

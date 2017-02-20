@@ -12,16 +12,14 @@ public class UserFunctionExpressionNode extends ExpressionNode{
 	public ExpressionNode body;
 	public List<ExpressionNode> input;
 	
-	public UserFunctionExpressionNode(UserFunction fun,List<ExpressionNode> input){
+	public UserFunctionExpressionNode(UserFunction fun,List<ExpressionNode> input) throws ParserException{
 		
 		this.arg=fun.getArg();
 		this.body=fun.getBody();
 		this.input=input;
 		
 		if (this.arg.size()!=this.input.size()){
-			
-			throw new IllegalArgumentException("mismatch arg and input size");
-			
+			throw new ParserException("mismatch arg and input size");		
 		}
 		
 	}

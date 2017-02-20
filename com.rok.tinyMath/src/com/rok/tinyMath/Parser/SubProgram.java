@@ -11,10 +11,20 @@ import com.rok.tinyMath.Expressions.ExpressionNode;
 import com.rok.tinyMath.Expressions.UserExpressionNode;
 import com.rok.tinyMath.Parser.Token.TType;
 
+/**
+ * 
+ *  ласс дл€ парсинга объ€влени€ пользователем новой функции.
+ * »де€ заключаетс€ в том, чтобы представить аргументы функции как глобальные
+ * переменные и использовать функционал базового класса неизменным. 
+ *
+ */
+
 public class SubProgram extends Program {
 	
 	Program topProgram;
+	// им€ функции
 	String name;
+	//список аргументов
 	Map<String,UserExpressionNode> arg = new LinkedHashMap<>();
 	LexicalTokenizer lt;
 	
@@ -25,9 +35,15 @@ public class SubProgram extends Program {
 	}
 	
 	@Override
+	/**
+	 * ‘ункци€ подмен€ет функцию в базовом классе,
+	 * таким образом аргументы функции определ€ютс€ как глобальные переменные
+	 */
 	protected ExpressionNode getConstant(Token t){
+		//сначала ищем переменную в списке аргументов
 		ExpressionNode exp = arg.get(t.sValue);
 		if (exp==null) {
+			//провер€ем список глобальных переменных
 			return topProgram.getConstant(t);
 		}else{
 			return exp;
@@ -41,19 +57,37 @@ public class SubProgram extends Program {
 		
 	}
 
+	/**
+	 * парсинг функции определенной пользователем
+	 * @return структура данных с телом и аргументами функции
+	 */
 	public UserFunction parseSubProgram() throws ParserException{
 		
+		Token t;
 		ExpressionNode cup = new ConstantExpressionNode(0);
+		
 		if (lt.match(TType.FUNCTION_DEC)){
-			name=lt.getCurToken().getsValue();
+			t = lt.getCurToken();
+			name=t.getsValue();
 			if (lt.match(TType.UNKNOW)){
+				//если функци€ уже объ€влена
+				if (topProgram.getFunction(name)!=null){
+					throw new ParserException("Function definition repeated");
+				}
 				if (lt.match(TType.OPEN_BRACKET)){
-					Token t;
 					//разбор аргументов функции
 					do
 					{
 						t = lt.getCurToken();
 						if(lt.match(TType.UNKNOW)){
+							//если имена аргументов функции совпадают
+							if(arg.containsKey(t.getsValue())){
+								throw new ParserException("Function Arguments name alignment");
+							}
+							//проверка на сопадение имени аргумента с глобальной переменной
+							if(topProgram.getConstant(t)!=null){
+								throw new ParserException("Function Arguments name equal global variable");
+							}
 							arg.put(t.getsValue(), new UserExpressionNode(cup));
 						}else{
 							throw new ParserException("Incorrect function decloration");
@@ -74,6 +108,5 @@ public class SubProgram extends Program {
 			throw new ParserException("Incorrect function decloration");
 		}
 		return null;
-		
 	}
 }
