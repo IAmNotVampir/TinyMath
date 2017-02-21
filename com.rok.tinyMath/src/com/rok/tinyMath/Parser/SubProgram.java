@@ -28,10 +28,10 @@ public class SubProgram extends Program {
 	Map<String,UserExpressionNode> arg = new LinkedHashMap<>();
 	LexicalTokenizer lt;
 	
-	public SubProgram(Program p, String programText) throws ParserException{
+	public SubProgram(Program p,LexicalTokenizer lt) throws ParserException{
 		
 		topProgram=p;
-		lt = new LexicalTokenizer(programText);
+		this.lt = lt;
 	}
 	
 	@Override

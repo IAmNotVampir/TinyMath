@@ -5,11 +5,18 @@ import java.util.List;
 
 import com.rok.tinyMath.Exceptions.ParserException;
 import com.rok.tinyMath.Parser.UserFunction;
-
+/**
+ *  ласс, содержащий распарсенную функцию,
+ * определенную пользователем
+ */
 public class UserFunctionExpressionNode extends ExpressionNode{
 	
+	// —писок ссылок на объекты,€вл€ющимис€ точками вхождени€ аргументов
+	//в теле функции
 	public List<UserExpressionNode> arg;
+	// тело функции
 	public ExpressionNode body;
+	//список значений аргументов
 	public List<ExpressionNode> input;
 	
 	public UserFunctionExpressionNode(UserFunction fun,List<ExpressionNode> input) throws ParserException{
@@ -19,7 +26,7 @@ public class UserFunctionExpressionNode extends ExpressionNode{
 		this.input=input;
 		
 		if (this.arg.size()!=this.input.size()){
-			throw new ParserException("mismatch arg and input size");		
+			throw new ParserException("Mismatch arg and input size");		
 		}
 		
 	}

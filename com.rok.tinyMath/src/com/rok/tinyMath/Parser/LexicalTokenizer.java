@@ -194,4 +194,12 @@ public class LexicalTokenizer {
 		return currentToken;
 	}
 
+	/**
+	 * Переводим указатель на токен в начало списка токенов
+	 */
+	public void reset(){
+		it=tokenList.iterator();
+		currentToken=it.next();
+	}
+	
 }

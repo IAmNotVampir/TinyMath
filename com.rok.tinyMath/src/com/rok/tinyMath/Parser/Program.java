@@ -2,11 +2,9 @@ package com.rok.tinyMath.Parser;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -33,24 +31,31 @@ public class Program {
 	public double Execute(String str){
 
 		try {
+			LexicalTokenizer lt = new LexicalTokenizer(str);
+			
+			//проверка на объ€вление новой глобальной переменной
+			if(parseConstantDefinition(lt)){
+				return 0;
+			}
+			lt.reset();
 			
 			//проверка на объ€вление новой функции
-			SubProgram sb = new SubProgram(this,str);
+			SubProgram sb = new SubProgram(this,lt);
 			UserFunction fun = sb.parseSubProgram();
 			if (fun!=null){
 				//объ€влена нова€ функци€, добавл€ем еЄ в список
 				functions.put(fun.getName(), fun);
 				return 0;
 			}
+			lt.reset();
 			
 			//парсиг арифмитического выражени€
-			LexicalTokenizer lt = new LexicalTokenizer(str);
 			ExpressionNode exp = startParse(lt);
 			Double answer = exp.getValue();
 			System.out.println(answer);
 			return answer;
 		} catch (ParserException e) {
-			System.out.println(e.toString());
+			System.out.println(e.getLocalizedMessage());
 			return 0;
 		}
 	}
@@ -157,8 +162,6 @@ public class Program {
 
 
 	protected ExpressionNode parseFUNCTION(Token prToken, LexicalTokenizer lt) throws ParserException{
-
-		Token t;
 
 		switch(prToken.tokenID){
 
@@ -307,6 +310,33 @@ public class Program {
 			
 			throw new RuntimeException(e);
 		}			
+	}
+	/**
+	 * –азбор объ€влени€ глобальной переменной
+	 */
+	protected boolean parseConstantDefinition(LexicalTokenizer lt) throws ParserException{
+  
+		Token t1 = lt.getCurToken(); 
+		if (!lt.match(TType.UNKNOW)){
+			return false;
+		}
+		
+		if (!lt.match(TType.EQUAL)){
+			return false;
+		}
+		
+		//проверка на допустимость имени переменной
+		if(functions.containsKey(t1.sValue)){
+			throw new ParserException("Prohibited constant name");
+		}
+		
+		Token t2 = lt.getCurToken();
+		if (lt.match(TType.NUMBER)){
+			constants.put(t1.sValue,parseNUMBER(t2));
+			return true;
+		}else{
+			throw new ParserException("Incorrect constant definition");
+		}
 	}
 }
 
