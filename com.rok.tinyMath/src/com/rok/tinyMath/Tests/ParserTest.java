@@ -31,6 +31,7 @@ public class ParserTest {
 		
 		double answer2 = p.Execute("sin(5)+cos(5+5)+sqrt(5)+abs(-5)+log(5)*floor(5)"
 				+ "*(pow(5,50)+ceil(5)+mod(5,5))");
+		
 		assertTrue(answer1==answer2);
 		
 		p.Execute("1.25E+2");
@@ -39,6 +40,9 @@ public class ParserTest {
 		p.Execute("func jk(a,b)=a*2+sqrt(b)");
 		p.Execute("func op(g)=jk(g,4)+1");
 		p.Execute("op(op(2))");
+		
+		p.Execute("x=10");
+		p.Execute("jk(x,x)");
 		
 	}
 }
