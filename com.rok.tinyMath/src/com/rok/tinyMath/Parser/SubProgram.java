@@ -58,7 +58,7 @@ public class SubProgram extends Program {
 	}
 
 	/**
-	 * парсинг функции определенной пользователем
+	 * парсинг функции, определенной пользователем
 	 * @return структура данных с телом и аргументами функции
 	 */
 	public UserFunction parseSubProgram() throws ParserException{
@@ -72,7 +72,11 @@ public class SubProgram extends Program {
 			if (lt.match(TType.UNKNOW)){
 				//если функци€ уже объ€влена
 				if (topProgram.getFunction(name)!=null){
-					throw new ParserException("Function definition repeated");
+					throw new ParserException("Dublicate function name");
+				}
+				//если им€ функции совпадает с именем глобальной переменной
+				if(topProgram.getConstant(t)!=null){
+					throw new ParserException("Function name used");
 				}
 				if (lt.match(TType.OPEN_BRACKET)){
 					//разбор аргументов функции
@@ -86,7 +90,7 @@ public class SubProgram extends Program {
 							}
 							//проверка на сопадение имени аргумента с глобальной переменной
 							if(topProgram.getConstant(t)!=null){
-								throw new ParserException("Function Arguments name equal global variable");
+								throw new ParserException("Function Arguments name dublicate global variable name");
 							}
 							arg.put(t.getsValue(), new UserExpressionNode(cup));
 						}else{
@@ -104,6 +108,8 @@ public class SubProgram extends Program {
 						}
 					}
 				}
+			}else if(lt.match(TType.FUNCTION)){
+				throw new ParserException("Dublicate function decloration");
 			}
 			throw new ParserException("Incorrect function decloration");
 		}
